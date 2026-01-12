@@ -4,6 +4,7 @@ import com.sashymov.beautyimsservice.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -27,4 +28,6 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 }
