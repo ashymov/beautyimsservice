@@ -84,22 +84,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response upload(MultipartFile multipartFile, Long userId) {
+    public Response upload(MultipartFile file, Long userId) {
         Response response = Response.getResponse();
         User user =  userRepo.findById(userId).orElse(null);
         if (user == null) {
-            response.setMessage("UserWork Not Found");
+            response.setMessage("User Not Found");
             response.setStatus(0);
             return response;
         }
-        FileResponse fileResponse = fileServiceFeign.upload(multipartFile);
-        File file = new File();
-        file.setFileDownloadUri(fileResponse.getDownloadUri());
-        file.setFileName(fileResponse.getFileName());
-        file.setFileType(fileResponse.getFileType());
-        file.setSize(fileResponse.getSize());
-        file = fileService.save(file);
-        user.setFile(file);
+        FileResponse fileResponse = fileServiceFeign.upload(file);
+        File file1 = new File();
+        file1.setFileDownloadUri(fileResponse.getDownloadUri());
+        file1.setFileName(fileResponse.getFileName());
+        file1.setFileType(fileResponse.getFileType());
+        file1.setSize(fileResponse.getSize());
+        file1 = fileService.save(file1);
+        user.setFile(file1);
         userRepo.save(user);
         response.setObject(user);
 

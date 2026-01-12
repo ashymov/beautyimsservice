@@ -92,7 +92,7 @@ public class UserWorkServiceImpl implements UserWorkService {
     }
 
     @Override
-    public Response upload(MultipartFile multipartFile, Long userWorkId) {
+    public Response upload(MultipartFile file, Long userWorkId) {
         Response response = Response.getResponse();
         UserWork userWork =  userWorkRepo.findById(userWorkId).orElse(null);
         if (userWork == null) {
@@ -100,14 +100,14 @@ public class UserWorkServiceImpl implements UserWorkService {
             response.setStatus(0);
             return response;
         }
-        FileResponse fileResponse = fileServiceFeign.upload(multipartFile);
-        File file = new File();
-        file.setFileDownloadUri(fileResponse.getDownloadUri());
-        file.setFileName(fileResponse.getFileName());
-        file.setFileType(fileResponse.getFileType());
-        file.setSize(fileResponse.getSize());
-        file = fileService.save(file);
-        userWork.setFile(file);
+        FileResponse fileResponse = fileServiceFeign.upload(file);
+        File file1 = new File();
+        file1.setFileDownloadUri(fileResponse.getDownloadUri());
+        file1.setFileName(fileResponse.getFileName());
+        file1.setFileType(fileResponse.getFileType());
+        file1.setSize(fileResponse.getSize());
+        file1 = fileService.save(file1);
+        userWork.setFile(file1);
         userWorkRepo.save(userWork);
         response.setObject(userWork);
 

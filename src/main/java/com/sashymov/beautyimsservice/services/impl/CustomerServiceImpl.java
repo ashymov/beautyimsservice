@@ -54,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Response upload(MultipartFile multipartFile, Long customerId) {
+    public Response upload(MultipartFile file, Long customerId) {
         Response response = Response.getResponse();
         Customer customer =  customerRepo.findById(customerId).orElse(null);
         if (customer == null) {
@@ -62,14 +62,14 @@ public class CustomerServiceImpl implements CustomerService {
             response.setStatus(0);
             return response;
         }
-        FileResponse fileResponse = fileServiceFeign.upload(multipartFile);
-        File file = new File();
-        file.setFileDownloadUri(fileResponse.getDownloadUri());
-        file.setFileName(fileResponse.getFileName());
-        file.setFileType(fileResponse.getFileType());
-        file.setSize(fileResponse.getSize());
-        file = fileService.save(file);
-        customer.setFile(file);
+        FileResponse fileResponse = fileServiceFeign.upload(file);
+        File file1 = new File();
+        file1.setFileDownloadUri(fileResponse.getDownloadUri());
+        file1.setFileName(fileResponse.getFileName());
+        file1.setFileType(fileResponse.getFileType());
+        file1.setSize(fileResponse.getSize());
+        file1 = fileService.save(file1);
+        customer.setFile(file1);
         customerRepo.save(customer);
         response.setObject(customer);
 
