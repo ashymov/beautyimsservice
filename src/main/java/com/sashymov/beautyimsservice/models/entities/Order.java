@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +24,13 @@ public class Order {
     private OrderStatus status;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<UserWork>  userWorks;
+    @ManyToMany
+    @JoinTable(
+            name = "orders_user_works",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_work_id")
+    )
+    private List<UserWork> userWorks = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;

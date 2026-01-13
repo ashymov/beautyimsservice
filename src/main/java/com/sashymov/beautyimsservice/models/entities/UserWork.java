@@ -3,6 +3,9 @@ package com.sashymov.beautyimsservice.models.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "user_works")
@@ -18,5 +21,7 @@ public class UserWork {
     @ManyToOne
     @JoinColumn(name = "file_id")
     private File file;
+    @ManyToMany(mappedBy = "userWorks")
+    private List<Order> orders = new ArrayList<>();
 
 }
