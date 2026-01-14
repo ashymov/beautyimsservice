@@ -11,7 +11,7 @@ import java.util.Date;
 @Table(name = "companies")
 public class Company {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "company_id")
     private Long companyId;
     private String companyName;

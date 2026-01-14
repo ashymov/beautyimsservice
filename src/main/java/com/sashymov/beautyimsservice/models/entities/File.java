@@ -9,7 +9,7 @@ import lombok.Data;
 @Table(name = "files")
 public class File {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
     private Long id;
     @Column(name = "file_name")

@@ -3,6 +3,9 @@ package com.sashymov.beautyimsservice.services.impl;
 import com.sashymov.beautyimsservice.dao.OrderRepo;
 import com.sashymov.beautyimsservice.dao.UserScheduleRepo;
 import com.sashymov.beautyimsservice.enums.OrderStatus;
+import com.sashymov.beautyimsservice.exceptions.InvalidTimeRangeException;
+import com.sashymov.beautyimsservice.exceptions.MissingTimeException;
+import com.sashymov.beautyimsservice.exceptions.TimeSlotBusyException;
 import com.sashymov.beautyimsservice.models.dto.CreateOrderDto;
 import com.sashymov.beautyimsservice.models.entities.*;
 import com.sashymov.beautyimsservice.respones.Response;
@@ -33,44 +36,34 @@ public class OrderServiceImpl implements OrderService {
         this.workingHoursService = workingHoursService;
     }
 
-    @Transactional
     @Override
     public Response save(CreateOrderDto dto) {
         Response response = Response.getResponse();
 
-        // 1) Базовая валидация времени
         if (dto.getStartTime() == null || dto.getEndTime() == null) {
-            throw new RuntimeException("StartTime/EndTime is required");
+            throw new MissingTimeException();
         }
         if (!dto.getEndTime().isAfter(dto.getStartTime())) {
-            throw new RuntimeException("End time must be after start time");
+            throw new InvalidTimeRangeException();
         }
 
-        // 2) Проверка рабочих часов (как у тебя)
-        workingHoursService.validateWorkingHours(
-                dto.getUserId(),
-                dto.getStartTime(),
-                dto.getEndTime()
-        );
+        workingHoursService.validateWorkingHours(dto.getUserId(), dto.getStartTime(), dto.getEndTime());
 
-        // 3) Проверка занятости
-        boolean busy = userScheduleRepo.existsOverlappingSlot(
+        boolean busy = orderRepo.existsOverlappingActiveOrder(
                 dto.getUserId(),
                 dto.getStartTime(),
                 dto.getEndTime()
         );
         if (busy) {
-            throw new RuntimeException("Time slot is busy");
+            throw new TimeSlotBusyException();
         }
 
-        // 4) Достаём всё один раз
         User user = userService.findById(dto.getUserId());
         Customer customer = customerService.findById(dto.getCustomerId());
         List<UserWork> userWorks = userWorkService.findAllByIdIn(dto.getUserWorksId());
 
         double price = userWorks.stream().mapToDouble(UserWork::getPrice).sum();
 
-        // 5) Создаём и сохраняем Order (ВАЖНО: сохраняем start/end)
         Order order = new Order();
         order.setStatus(OrderStatus.ACTIVE);
         order.setUser(user);
@@ -81,18 +74,9 @@ public class OrderServiceImpl implements OrderService {
         order.setEndTime(dto.getEndTime());
         order.setPrice(price);
 
-        order = orderRepo.save(order);
+        Order saved = orderRepo.save(order);
 
-        // 6) Создаём слот (можно связать с order, если поле есть)
-        UserSchedule slot = new UserSchedule();
-        slot.setUser(user);
-        slot.setStartTime(dto.getStartTime());
-        slot.setEndTime(dto.getEndTime());
-        // slot.setOrder(order); // если добавишь связь в сущность
-
-        userScheduleRepo.save(slot);
-
-        response.setObject(order);
+        response.setObject(saved);
         return response;
     }
 

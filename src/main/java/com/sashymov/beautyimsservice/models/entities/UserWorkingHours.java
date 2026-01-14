@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @Data
 public class UserWorkingHours {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,5 +29,7 @@ public class UserWorkingHours {
     @JsonFormat(pattern = "HH:mm")
     @Column(nullable = false)
     private LocalTime endTime;
+    @Column(name = "is_day_off")
+    private boolean dayOff = false;
 }
 

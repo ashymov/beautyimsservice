@@ -1,6 +1,7 @@
 package com.sashymov.beautyimsservice.services.impl;
 
 import com.sashymov.beautyimsservice.dao.UserRepo;
+import com.sashymov.beautyimsservice.exceptions.NotFoundException;
 import com.sashymov.beautyimsservice.microservices.fileService.FileResponse;
 import com.sashymov.beautyimsservice.microservices.fileService.FileServiceFeign;
 import com.sashymov.beautyimsservice.models.dto.UserDto;
@@ -79,8 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(Long id) {
-        User user = userRepo.findById(id).orElse(null);
-        return user;
+        return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User", id));
     }
 
     @Override
