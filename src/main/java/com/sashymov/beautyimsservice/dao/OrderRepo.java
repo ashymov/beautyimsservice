@@ -2,6 +2,7 @@ package com.sashymov.beautyimsservice.dao;
 
 import com.sashymov.beautyimsservice.models.entities.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -50,4 +51,19 @@ where o.user.id = :userId
 order by o.startTime
 """)
     List<Order> findActiveOrdersInRange(Long userId, LocalDateTime rangeStart, LocalDateTime rangeEnd);
+
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+ update Order o
+ set o.status = com.sashymov.beautyimsservice.enums.OrderStatus.CANCELLED,
+     o.canceledAt = :canceledAt,
+     o.cancelReason = :reason
+ where o.id = :orderId
+   and o.status <> com.sashymov.beautyimsservice.enums.OrderStatus.CANCELLED
+   and o.status <> com.sashymov.beautyimsservice.enums.OrderStatus.COMPLETED
+""")
+    int cancelOrder(Long orderId, LocalDateTime canceledAt, String reason);
+
+
 }

@@ -1,6 +1,8 @@
 package com.sashymov.beautyimsservice.controllers;
 
+import com.sashymov.beautyimsservice.models.dto.CancelOrderDto;
 import com.sashymov.beautyimsservice.models.dto.CreateOrderDto;
+import com.sashymov.beautyimsservice.models.dto.RescheduleOrderDto;
 import com.sashymov.beautyimsservice.models.entities.Order;
 import com.sashymov.beautyimsservice.respones.Response;
 import com.sashymov.beautyimsservice.services.OrderService;
@@ -37,5 +39,13 @@ public class OrderController {
     @GetMapping("/getByCustomerPhone")
     public List<Order> getByCustomerPhone(String customerPhone) {
         return orderService.findByCustomerPhone(customerPhone);
+    }
+    @PostMapping("/cancel/{orderId}")
+    public Response cancel(@PathVariable("orderId") Long orderId, @RequestBody CancelOrderDto cancelOrderDto) {
+        return orderService.cancel(orderId, cancelOrderDto);
+    }
+    @PostMapping("/{orderId}/reschedule")
+    public Response reschedule(@PathVariable Long orderId,@RequestBody RescheduleOrderDto dto) {
+        return orderService.reschedule(orderId, dto);
     }
 }

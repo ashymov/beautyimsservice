@@ -23,5 +23,7 @@ public class UserWork {
     private File file;
     @ManyToMany(mappedBy = "userWorks")
     private List<Order> orders = new ArrayList<>();
+    @Column(nullable = false)
+    private int durationMinutes;
 
 }

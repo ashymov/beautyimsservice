@@ -8,20 +8,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-public class CreateOrderDto {
 
-        private Long userId;
+public record    CreateOrderDto (
 
-        private List<Long> userWorksId;
-
-        private Long customerId;
-
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @Schema(example = "2026-01-12 12:00", type = "string")
-        private LocalDateTime startTime;
-
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-        @Schema(example = "2026-01-12 13:00", type = "string")
-        private LocalDateTime endTime;
-    }
+            Long userId,
+            Long customerId,
+            List<Long> userWorksId,
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+            @Schema(
+                    type = "string")
+            LocalDateTime startTime
+    ) {}

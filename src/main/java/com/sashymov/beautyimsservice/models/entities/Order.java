@@ -36,4 +36,8 @@ public class Order {
     private Customer customer;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String cancelReason;
+    private LocalDateTime canceledAt;
+
+
 }
