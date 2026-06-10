@@ -1,5 +1,6 @@
 package com.sashymov.beautyimsservice.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sashymov.beautyimsservice.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class Order {
     private double price;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @ManyToMany
@@ -38,6 +40,4 @@ public class Order {
     private LocalDateTime endTime;
     private String cancelReason;
     private LocalDateTime canceledAt;
-
-
 }
