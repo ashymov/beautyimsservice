@@ -5,6 +5,7 @@ import com.sashymov.beautyimsservice.microservices.fileService.FileResponse;
 import com.sashymov.beautyimsservice.microservices.fileService.FileServiceFeign;
 import com.sashymov.beautyimsservice.models.dto.CreateUserWorkDto;
 import com.sashymov.beautyimsservice.models.entities.File;
+import com.sashymov.beautyimsservice.models.entities.User;
 import com.sashymov.beautyimsservice.models.entities.UserWork;
 import com.sashymov.beautyimsservice.respones.Response;
 import com.sashymov.beautyimsservice.services.FileService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
 @Service
 public class UserWorkServiceImpl implements UserWorkService {
 
@@ -22,7 +24,8 @@ public class UserWorkServiceImpl implements UserWorkService {
     private final FileServiceFeign fileServiceFeign;
     private final FileService fileService;
 
-    public UserWorkServiceImpl(UserWorkRepo userWorkRepo, UserService userService, FileServiceFeign fileServiceFeign, FileService fileService) {
+    public UserWorkServiceImpl(UserWorkRepo userWorkRepo, UserService userService,
+                               FileServiceFeign fileServiceFeign, FileService fileService) {
         this.userWorkRepo = userWorkRepo;
         this.userService = userService;
         this.fileServiceFeign = fileServiceFeign;
@@ -32,29 +35,40 @@ public class UserWorkServiceImpl implements UserWorkService {
     @Override
     public Response findByName(String userWorkName) {
         Response response = Response.getResponse();
-       UserWork userWork =  userWorkRepo.findByName(userWorkName);
-       response.setObject(userWork);
+        UserWork userWork = userWorkRepo.findByName(userWorkName);
+        response.setObject(userWork);
         return response;
     }
 
     @Override
-    public Response save(CreateUserWorkDto createUserWorkDto) {
+    public Response save(CreateUserWorkDto dto) {
         Response response = Response.getResponse();
 
-        UserWork userWork =  new UserWork();
-        userWork.setName( createUserWorkDto.getName());
-        userWork.setPrice( createUserWorkDto.getPrice());
-        userWork.setUser(userService.findById(createUserWorkDto.getUserId()));
+        try {
+            User user = userService.findById(dto.getUserId());
+            UserWork userWork = new UserWork();
+            userWork.setName(dto.getName());
+            userWork.setPrice(dto.getPrice());
+            userWork.setDurationMinutes(dto.getDurationMinutes());
+            userWork.setUser(user);
 
-        userWorkRepo.save(userWork);
-        response.setObject(userWork);
+            UserWork saved = userWorkRepo.save(userWork);
+
+            response.setObject(saved);
+            response.setMessage("User work created successfully");
+
+        } catch (Exception e) {
+            response.setStatus(0);
+            response.setMessage("Error: " + e.getMessage());
+        }
+
         return response;
     }
 
     @Override
     public Response findAll() {
         Response response = Response.getResponse();
-        List<UserWork> userWorks = userWorkRepo.findAll();
+        List<UserWork> userWorks = userWorkRepo.findAllWithUser();
         response.setObject(userWorks);
         return response;
     }
@@ -94,7 +108,7 @@ public class UserWorkServiceImpl implements UserWorkService {
     @Override
     public Response upload(MultipartFile file, Long userWorkId) {
         Response response = Response.getResponse();
-        UserWork userWork =  userWorkRepo.findById(userWorkId).orElse(null);
+        UserWork userWork = userWorkRepo.findById(userWorkId).orElse(null);
         if (userWork == null) {
             response.setMessage("UserWork Not Found");
             response.setStatus(0);
@@ -110,9 +124,6 @@ public class UserWorkServiceImpl implements UserWorkService {
         userWork.setFile(file1);
         userWorkRepo.save(userWork);
         response.setObject(userWork);
-
-
-
         return response;
     }
 
@@ -120,6 +131,4 @@ public class UserWorkServiceImpl implements UserWorkService {
     public List<UserWork> findAllByIdIn(List<Long> ids) {
         return userWorkRepo.findAllByIdIn(ids);
     }
-
-
 }

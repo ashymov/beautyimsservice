@@ -9,4 +9,5 @@ public class CreateUserWorkDto {
     private String name;
     private double price;
     private Long userId;
+    private int durationMinutes;
 }
